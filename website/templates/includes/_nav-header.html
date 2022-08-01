@@ -1,0 +1,25 @@
+
+<nav class="navbar navbar-expand-lg navbar-custom p-4 m-4 mb-2">
+    <div class="container-fluid">
+        <a href="{{ url_for('index') }}"><h4>FACE DETECTION SYSTEM</h4></a>
+        <div class="d-flex border p-3">
+            <div class="d-inline">
+                Active users:
+            </div>
+            <div class="d-inline px-2">
+                <h4 id='user_counter'></h4>
+            </div>
+        </div>
+    </div>
+</nav>
+<script>
+    $(document).ready(function(){
+        var namespace = '/';    
+        var socket = io.connect('http://' + document.domain + ':' + location.port + namespace);
+        socket.on('users', function(users) {
+            userCount = document.getElementById('user_counter');
+            userCount.innerHTML = users.user_count;
+        });
+    });
+</script>
+

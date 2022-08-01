@@ -1,0 +1,69 @@
+<div id='canvas-div' class="row py-3 my-3 mx-1 border border-light">
+    <div id="detection-info" class="pb-2" style="color:white;"></div>
+    <canvas id="canvas"></canvas>
+</div>
+<script>
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext("2d");
+    
+    document.getElementById('canvas-div').style.display = 'none';
+
+    var img = new Image();
+
+    var faces = null;
+
+    var ctx_faces = null;
+    var ctx_filename = null;
+
+    function displayImg(faces, filename) {
+
+        document.getElementById('canvas-div').style.display = 'block';
+
+        ctx_faces = faces;
+        ctx_filename = filename;
+        image = filename;
+
+        img.style.display = "block";
+        img.src = "/image/" + image;
+        
+        ctx.canvas.width = img.width;
+        ctx.canvas.height = img.height;
+        canvas.width = img.width;
+        canvas.height = img.height;
+        ctx.drawImage(img, 0, 0);
+
+        var detectedFacesNum = 0;
+        
+        var drawBbox = function(xMin, xMax, yMin, yMax) {
+            ctx.strokeStyle = 'blue';
+            ctx.lineWidth = 2;
+            ctx.rect(xMin, yMin, xMax - xMin, yMax - yMin);
+            ctx.stroke();
+        };
+
+        img.onload = function(event) {
+            restartCanvas();
+                // Iterate through each detected faces
+                for (var k of Object.keys(ctx_faces[ctx_filename])) {
+                    xMin = faces[ctx_filename][k]['face']['xMin'];
+                    xMax = faces[ctx_filename][k]['face']['xMax'];
+                    yMin = faces[ctx_filename][k]['face']['yMin'];
+                    yMax = faces[ctx_filename][k]['face']['yMax'];
+
+                    drawBbox(xMin, xMax, yMin, yMax);
+
+                    detectedFacesNum += 1;
+
+                    document.getElementById("detection-info").innerHTML = "The number of detected faces: " + detectedFacesNum;
+            }
+        };
+
+        function restartCanvas() {
+            ctx.canvas.width = img.width;
+            ctx.canvas.height = img.height;
+            canvas.width = img.width;
+            canvas.height = img.height;
+            ctx.drawImage(img, 0, 0);
+        }
+    }
+</script>

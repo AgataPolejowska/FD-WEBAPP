@@ -1,0 +1,47 @@
+<div class="row pb-2 align-items-start">
+    <form id="upload-img-form" method="POST" enctype="multipart/form-data">
+            <p class="text-white">Upload an image: </p>
+            <div class="input-group mb-3 bg-white border border-secondary">
+                <input id="file" name="file" type="file" multiple="false" class="form-control border-0">
+                <button id="upload-img-btn" type="button" class="btn btn-dark btn-outline-light rounded-0 px-5">UPLOAD</button>
+            </div>
+    </form>
+    <div id="feedback-success-message">
+        <div class="alert alert-success rounded-0 p-1 py-2" role="alert">
+            Success!
+        </div>
+    </div>
+    <div id="feedback-failure-message">
+        <div class="alert alert-danger rounded-0 p-1 py-2" role="alert">
+            Invalid input!
+        </div>
+    </div>
+</div>
+<script>
+    document.getElementById("feedback-success-message").style.display = 'none';
+    document.getElementById("feedback-failure-message").style.display = 'none';
+
+    $(function() {
+        $('#upload-img-btn').click(function() {
+            var form_data = new FormData($('#upload-img-form')[0]);
+            $.ajax({
+                type: 'POST',
+                url: '/images',
+                data: form_data,
+                contentType: false,
+                cache: false,
+                processData: false,
+                success: function(data) {
+                    console.log('Success!');
+                    document.getElementById("feedback-failure-message").style.display = 'none';
+                    document.getElementById("feedback-success-message").style.display = 'block';
+                },
+                error: function(error) {
+                    console.log(error);
+                    document.getElementById("feedback-success-message").style.display = 'none';
+                    document.getElementById("feedback-failure-message").style.display = 'block';
+                }
+            });
+        });
+    });
+</script>

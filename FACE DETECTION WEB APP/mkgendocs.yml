@@ -1,0 +1,30 @@
+
+sources_dir: docs
+templates_dir: docs/templates
+
+pages:
+  - page: "website/restful/resources.md"
+    source: "website/restful/resources.py"
+
+  - page: "website/socketio/events.md"
+    source: "website/socketio/events.py"
+    functions:
+      - connect
+      - disconnect
+
+  - page: "website/__init__.md"
+    source: "website/__init__.py"
+    functions:
+      - create_api
+
+  - page: "website/routes.md"
+    source: "website/routes.py"
+    functions:
+      - index
+      - upload
+
+  - page: "website/utils.md"
+    source: "website/utils.py"
+    functions:
+      - allowed_file
+      - get_faces

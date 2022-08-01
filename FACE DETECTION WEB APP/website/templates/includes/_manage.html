@@ -1,0 +1,144 @@
+<div class="row pb-2 align-items-start px-4">
+    <div class="row px-5">
+        <button id="show-upload-btn" class="btn btn-dark btn-outline-light rounded-0">SHOW UPLOADS</button>
+    </div>
+    <div id="uploads-div" class="p-4">
+        <ul id="uploads-list" class="list-group list-group-flush">
+        </ul>
+    </div>
+</div>
+<script>
+    var uploadsDiv = document.getElementById('uploads-div');
+
+    uploadsDiv.style.display='none';
+
+    var uploadsList = document.getElementById('uploads-list');
+
+    var filenamesList = [];
+
+    $(function() {
+        $('#show-upload-btn').click(function() {
+            $.ajax({
+                type: 'GET',
+                url: '/images',
+                contentType: false,
+                cache: false,
+                processData: false,
+                success: function(data) {
+                    response = JSON.parse(JSON.stringify((data.uploads)));
+                        for (var key of Object.keys(response)) {
+                            for (var k of Object.keys(response[key])) {
+                                if (filenamesList.indexOf(response[key][k]) >= 0) {
+                                    continue;
+                                }
+                                else {
+                                    filenamesList.push(response[key][k]);
+                                    addToList(response[key][k]);
+                                }
+                            }
+                        }
+                        showList();
+                        hideInputMessages();  
+                },
+                error: function(error) {
+                    console.log(error);
+                }
+            });
+        });
+    });
+
+    function showList() {
+        uploadsDiv.style.display = 'block';
+    }
+
+    function hideInputMessages() {
+        document.getElementById("feedback-success-message").style.display = 'none';
+        document.getElementById("feedback-failure-message").style.display = 'none';
+    }
+
+    function removeEntry(value) {
+        document.getElementById(value).remove();
+    }
+
+    function addToList(value) {
+        var entry = document.createElement('li');
+        entry.className = "list-group-item";
+        entry.id = value;
+        entry.style.background = "black";
+        entry.style.color = "white";
+        
+        var btn = document.createElement("button");
+        btn.appendChild(document.createTextNode("DETECT FACES"));
+        btn.className = "btn btn-dark btn-outline-light rounded-0 mx-3";
+        btn.setAttribute("id", value + '_detect');
+        entry.appendChild(btn);
+
+        var btnDelete = document.createElement("button");
+        btnDelete.appendChild(document.createTextNode("DELETE"));
+        btnDelete.className = "btn btn-danger rounded-0 mx-3";
+        btnDelete.setAttribute("id", value + '_delete');
+        entry.appendChild(btnDelete);
+
+        entry.appendChild(document.createTextNode(value));
+        uploadsList.appendChild(entry);
+
+        const element = document.getElementById(value + '_detect');
+        const element_delete = document.getElementById(value + '_delete');
+
+        element.addEventListener("click", () => {
+            console.log("clicked");
+            $.ajax({
+                    type: 'GET',
+                    url: '/face/' + value,
+                    data: value,
+                    contentType: false,
+                    cache: false,
+                    processData: false,
+                    success: function(data) {
+                        data = JSON.parse(JSON.stringify((data.faces)));
+                        displayImg(data, value);
+                    }
+                });
+        });
+        
+        element_delete.addEventListener("click", () => {
+            console.log("clicked delete");
+            $.ajax({
+                    type: 'DELETE',
+                    url: '/image/' + value,
+                    data: value,
+                    contentType: false,
+                    cache: false,
+                    processData: false,
+                    success:
+                        removeEntry(value),
+                        function(data) {
+                        $.ajax({
+                        type: 'GET',
+                        url: '/images',
+                        contentType: false,
+                        cache: false,
+                        processData: false,
+                        success: function(data) {
+                            response = JSON.parse(JSON.stringify((data.uploads)));
+                            console.log(response)
+                                for (var key of Object.keys(response)) {
+                                    for (var k of Object.keys(response[key])) {
+                                        if (filenamesList.indexOf(response[key][k]) >= 0) {
+                                            continue;
+                                        }
+                                        else {
+                                            filenamesList.push(response[key][k]);
+                                            addToList(response[key][k]);
+                                        }
+                                    }
+                                }
+                                showList();
+                                hideInputMessages();  
+                            }
+                        });
+                    }
+                });
+        });    
+    }
+</script>
